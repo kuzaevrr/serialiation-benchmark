@@ -1,4 +1,4 @@
-namespace benchmark.model;
+namespace ram.ka.ru.models.flatbuffers;
 
 table User {
     id: string;

@@ -2,15 +2,16 @@ package serializers
 
 import (
 	"golang/models"
+	"golang/models/flatbuffers"
 	"time"
 
-	flatbuffers "github.com/google/flatbuffers/go"
+	flatbufferslib "github.com/google/flatbuffers/go"
 )
 
 type FlatBuffersSerializer struct{}
 
 func (s *FlatBuffersSerializer) Serialize(user *models.User) ([]byte, error) {
-	builder := flatbuffers.NewBuilder(1024)
+	builder := flatbufferslib.NewBuilder(1024)
 
 	// Создаем строки
 	idOffset := builder.CreateString(user.ID)
@@ -18,34 +19,34 @@ func (s *FlatBuffersSerializer) Serialize(user *models.User) ([]byte, error) {
 	emailOffset := builder.CreateString(user.Email)
 
 	// Создаем вектор для ролей
-	rolesOffsets := make([]flatbuffers.UOffsetT, len(user.Roles))
+	rolesOffsets := make([]flatbufferslib.UOffsetT, len(user.Roles))
 	for i, role := range user.Roles {
 		rolesOffsets[i] = builder.CreateString(role)
 	}
-	models.UserStartRolesVector(builder, len(rolesOffsets))
+	flatbuffers.UserStartRolesVector(builder, len(rolesOffsets))
 	for i := len(rolesOffsets) - 1; i >= 0; i-- {
 		builder.PrependUOffsetT(rolesOffsets[i])
 	}
 	rolesVector := builder.EndVector(len(rolesOffsets))
 
 	// Создаем объект User
-	models.UserStart(builder)
-	models.UserAddId(builder, idOffset)
-	models.UserAddName(builder, nameOffset)
-	models.UserAddEmail(builder, emailOffset)
-	models.UserAddAge(builder, int32(user.Age))
-	models.UserAddActive(builder, user.Active)
-	models.UserAddRoles(builder, rolesVector)
-	models.UserAddBalance(builder, user.Balance)
+	flatbuffers.UserStart(builder)
+	flatbuffers.UserAddId(builder, idOffset)
+	flatbuffers.UserAddName(builder, nameOffset)
+	flatbuffers.UserAddEmail(builder, emailOffset)
+	flatbuffers.UserAddAge(builder, user.Age)
+	flatbuffers.UserAddActive(builder, user.Active)
+	flatbuffers.UserAddRoles(builder, rolesVector)
+	flatbuffers.UserAddBalance(builder, user.Balance)
 
-	userOffset := models.UserEnd(builder)
+	userOffset := flatbuffers.UserEnd(builder)
 	builder.Finish(userOffset)
 
 	return builder.FinishedBytes(), nil
 }
 
 func (s *FlatBuffersSerializer) Deserialize(data []byte) (*models.User, error) {
-	userFlat := models.GetRootAsUser(data, 0)
+	userFlat := flatbuffers.GetRootAsUser(data, 0)
 
 	// Восстанавливаем роли
 	roles := make([]string, userFlat.RolesLength())
@@ -57,7 +58,7 @@ func (s *FlatBuffersSerializer) Deserialize(data []byte) (*models.User, error) {
 		ID:      string(userFlat.Id()),
 		Name:    string(userFlat.Name()),
 		Email:   string(userFlat.Email()),
-		Age:     int(userFlat.Age()),
+		Age:     userFlat.Age(),
 		Active:  userFlat.Active(),
 		Roles:   roles,
 		Balance: userFlat.Balance(),

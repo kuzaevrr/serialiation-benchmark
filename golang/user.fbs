@@ -1,4 +1,4 @@
-namespace models;
+namespace models.flatbuffers;
 
 table User {
     id: string;

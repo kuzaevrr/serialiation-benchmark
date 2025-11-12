@@ -3,14 +3,16 @@
 
 echo "Starting full serialization experiment..."
 
-# Генерация кода FlatBuffers
-./scripts/generate_flatbuffers.sh
+# Генерация кода
+./generate_flatbuffers.sh
+./generate_protobuf.sh
+
 
 # Запуск Java бенчмарков
-./scripts/run_java_benchmarks.sh
+./java/run_java_benchmarks.sh
 
 # Запуск Go бенчмарков
-./scripts/run_go_benchmarks.sh
+./golang/run_go_benchmarks.sh
 
 # Анализ результатов
 echo "Analyzing results..."

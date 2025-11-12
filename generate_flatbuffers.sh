@@ -5,10 +5,10 @@ echo "Generating FlatBuffers code..."
 
 # Генерация для Java
 echo "Generating Java code..."
-flatc --java -o java/src/main/java src/main/flatbuffers/user.fbs
+flatc --java -o java/src/main/java java/src/main/java/ram/ka/ru/user.fbs
 
 # Генерация для Go
 echo "Generating Go code..."
-flatc --go -o go/models go/models/user.fbs
+flatc --go -o golang golang/user.fbs
 
 echo "FlatBuffers code generation completed!"
