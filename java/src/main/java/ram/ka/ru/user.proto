@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package ram.ka.ru.models;
+
+option java_package = "ram.ka.ru.models";
+option java_outer_classname = "UserProtos";
+
+message UserProto {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  int32 age = 4;
+  bool active = 5;
+  repeated string roles = 6;
+  double balance = 7;
+}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package models;
+
+option go_package = "/models";
+
+message UserProto {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  int32 age = 4;
+  bool active = 5;
+  repeated string roles = 6;
+  double balance = 7;
+}

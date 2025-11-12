@@ -1,0 +1,13 @@
+namespace models;
+
+table User {
+    id: string;
+    name: string;
+    email: string;
+    age: int;
+    active: bool;
+    roles: [string];
+    balance: double;
+}
+
+root_type User;
