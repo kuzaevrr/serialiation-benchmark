@@ -1,8 +1,13 @@
 // User.java
 package ram.ka.ru.models;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
+@XmlRootElement
 public class User {
     private String id;
     private String name;
@@ -41,7 +46,13 @@ public class User {
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
     
-    public List<String> getRoles() { return roles; }
+    public List<String> getRoles() {
+        if (isNull(roles)) {
+            roles = new ArrayList<>();
+        }
+
+        return roles;
+    }
     public void setRoles(List<String> roles) { this.roles = roles; }
     
     public double getBalance() { return balance; }

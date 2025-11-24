@@ -78,8 +78,7 @@ public class SerializationBenchmark {
             }
         }
     }
-
-    private void benchmarkFormat(String formatName, Object serializer) throws IOException {
+    private BenchmarkResult benchmarkFormat(String formatName, Object serializer) throws IOException {
         System.out.println("\n=== " + formatName + " Benchmark ===");
 
         long totalSerializationTime = 0;
@@ -120,13 +119,62 @@ public class SerializationBenchmark {
             totalBytes += serializedData.length;
         }
 
-        double avgSerializationTimeMs = (totalSerializationTime / (double) testData.size()) / 1_000_000.0;
-        double avgDeserializationTimeMs = (totalDeserializationTime / (double) testData.size()) / 1_000_000.0;
+        long avgSerializationTime = totalSerializationTime / testData.size();
+        long avgDeserializationTime = totalDeserializationTime / testData.size();
         double avgSizeBytes = totalBytes / (double) testData.size();
 
-        System.out.printf("Avg Serialization Time: %.3f ms%n", avgSerializationTimeMs);
-        System.out.printf("Avg Deserialization Time: %.3f ms%n", avgDeserializationTimeMs);
+        System.out.printf("Avg Serialization Time: %.3f ms%n", avgSerializationTime / 1_000_000.0);
+        System.out.printf("Avg Deserialization Time: %.3f ms%n", avgDeserializationTime / 1_000_000.0);
         System.out.printf("Avg Data Size: %.2f bytes%n", avgSizeBytes);
+
+        // Measure memory usage
+        System.gc();
+        long memoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+        List<byte[]> serializedData = new ArrayList<>();
+        for (User user : testData) {
+            if (serializer instanceof JsonSerializer) {
+                serializedData.add(((JsonSerializer) serializer).serialize(user));
+            } else if (serializer instanceof XmlSerializer) {
+                serializedData.add(((XmlSerializer) serializer).serialize(user));
+            } else if (serializer instanceof ProtobufSerializer) {
+                serializedData.add(((ProtobufSerializer) serializer).serialize(user));
+            } else if (serializer instanceof FlatBuffersSerializer) {
+                serializedData.add(((FlatBuffersSerializer) serializer).serialize(user));
+            }
+        }
+
+        long memoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        long memoryUsed = memoryAfter - memoryBefore;
+        serializedData.clear();
+        System.gc();
+
+        System.out.printf("Memory Used: %d bytes%n", memoryUsed);
+
+        // Measure throughput
+        int throughputIterations = 10000;
+
+        long start = System.nanoTime();
+        for (int i = 0; i < throughputIterations; i++) {
+            for (User user : testData.subList(0, Math.min(100, testData.size()))) {
+                if (serializer instanceof JsonSerializer) {
+                    ((JsonSerializer) serializer).serialize(user);
+                } else if (serializer instanceof XmlSerializer) {
+                    ((XmlSerializer) serializer).serialize(user);
+                } else if (serializer instanceof ProtobufSerializer) {
+                    ((ProtobufSerializer) serializer).serialize(user);
+                } else if (serializer instanceof FlatBuffersSerializer) {
+                    ((FlatBuffersSerializer) serializer).serialize(user);
+                }
+            }
+        }
+        long end = System.nanoTime();
+        double throughput = (throughputIterations * Math.min(100, testData.size())) / ((end - start) / 1_000_000_000.0);
+
+        System.out.printf("Throughput: %.4f ops/sec%n", throughput);
+
+        return new BenchmarkResult("Java", formatName, avgSerializationTime, avgDeserializationTime,
+                avgSizeBytes, memoryUsed, throughput);
     }
 
     private void compareMemoryUsage() throws IOException {
@@ -143,6 +191,18 @@ public class SerializationBenchmark {
         }
         long memoryAfterJson = runtime.totalMemory() - runtime.freeMemory();
         long jsonMemoryUsed = memoryAfterJson - memoryBeforeJson;
+        jsonData.clear();
+
+        // Measure JSON memory
+        runtime.gc();
+        long memoryBeforeXml = runtime.totalMemory() - runtime.freeMemory();
+        List<byte[]> xmlData = new ArrayList<>();
+        for (User user : testData) {
+            xmlData.add(xmlSerializer.serialize(user));
+        }
+        long memoryAfterXml = runtime.totalMemory() - runtime.freeMemory();
+        long xmlMemoryUsed = memoryAfterXml - memoryBeforeXml;
+        xmlData.clear();
 
         // Measure Protobuf memory
         runtime.gc();
@@ -153,11 +213,29 @@ public class SerializationBenchmark {
         }
         long memoryAfterProto = runtime.totalMemory() - runtime.freeMemory();
         long protoMemoryUsed = memoryAfterProto - memoryBeforeProto;
+        protoData.clear();
 
-        System.out.printf("JSON Memory Used: %d bytes%n", jsonMemoryUsed);
-        System.out.printf("Protobuf Memory Used: %d bytes%n", protoMemoryUsed);
-        System.out.printf("Memory Ratio (JSON/Protobuf): %.2f%n",
-            jsonMemoryUsed / (double) protoMemoryUsed);
+        // Measure Flat Buffer memory
+        runtime.gc();
+        long memoryBeforeFlatBuffer = runtime.totalMemory() - runtime.freeMemory();
+        List<byte[]> flatBufferData = new ArrayList<>();
+        for (User user : testData) {
+            protoData.add(flatBuffersSerializer.serialize(user));
+        }
+        long memoryAfterFlatBuffer = runtime.totalMemory() - runtime.freeMemory();
+        long flatBufferMemoryUsed = memoryAfterFlatBuffer - memoryBeforeFlatBuffer;
+        flatBufferData.clear();
+
+        runtime.gc();
+
+        System.out.printf("JSON Memory Used: %d bytes (%s MB)%n", jsonMemoryUsed, toMB(jsonMemoryUsed));
+        System.out.printf("XML Memory Used: %d bytes (%s MB)%n", xmlMemoryUsed, toMB(xmlMemoryUsed));
+        System.out.printf("Protobuf Memory Used: %d bytes (%s MB)%n", protoMemoryUsed, toMB(protoMemoryUsed));
+        System.out.printf("FlatBuffer Memory Used: %d bytes (%s MB)%n", flatBufferMemoryUsed, toMB(flatBufferMemoryUsed));
+    }
+
+    private String toMB(long bytes) {
+        return String.format("%.4f", (double) bytes / (1024.0 * 1024.0));
     }
 
     private void measureThroughput() throws IOException {
@@ -174,6 +252,16 @@ public class SerializationBenchmark {
         long jsonEnd = System.nanoTime();
         double jsonThroughput = (throughputIterations * 100.0) / ((jsonEnd - jsonStart) / 1_000_000_000.0);
 
+        // XML throughput
+        long xmlStart = System.nanoTime();
+        for (int i = 0; i < throughputIterations; i++) {
+            for (User user : testData.subList(0, 100)) {
+                xmlSerializer.serialize(user);
+            }
+        }
+        long xmlEnd = System.nanoTime();
+        double xmlThroughput = (throughputIterations * 100.0) / ((xmlEnd - xmlStart) / 1_000_000_000.0);
+
         // Protobuf throughput
         long protoStart = System.nanoTime();
         for (int i = 0; i < throughputIterations; i++) {
@@ -184,9 +272,21 @@ public class SerializationBenchmark {
         long protoEnd = System.nanoTime();
         double protoThroughput = (throughputIterations * 100.0) / ((protoEnd - protoStart) / 1_000_000_000.0);
 
-        System.out.printf("JSON Throughput: %.2f ops/sec%n", jsonThroughput);
-        System.out.printf("Protobuf Throughput: %.2f ops/sec%n", protoThroughput);
-        System.out.printf("Throughput Ratio (Protobuf/JSON): %.2f%n", protoThroughput / jsonThroughput);
+        // FlatBuffer throughput
+        long flatBufferStart = System.nanoTime();
+        for (int i = 0; i < throughputIterations; i++) {
+            for (User user : testData.subList(0, 100)) {
+                flatBuffersSerializer.serialize(user);
+            }
+        }
+        long flatBufferEnd = System.nanoTime();
+        double flatBufferThroughput = (throughputIterations * 100.0) / ((flatBufferEnd - flatBufferStart) / 1_000_000_000.0);
+
+        System.out.printf("JSON Throughput: %.4f ops/sec%n", jsonThroughput);
+        System.out.printf("XML Throughput: %.4f ops/sec%n", xmlThroughput);
+        System.out.printf("Protobuf Throughput: %.4f ops/sec%n", protoThroughput);
+        System.out.printf("FlatBuffer Throughput: %.4f ops/sec%n", flatBufferThroughput);
+
     }
 
     public static void main(String[] args) throws IOException {
