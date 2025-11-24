@@ -2,6 +2,7 @@
 package ram.ka.ru.formats;
 
 import ram.ka.ru.models.User;
+import ram.ka.ru.models.UserProtos;
 
 import java.io.IOException;
 

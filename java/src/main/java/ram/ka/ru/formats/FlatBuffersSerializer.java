@@ -1,7 +1,6 @@
 package ram.ka.ru.formats;
 
 import ram.ka.ru.models.User;
-import ram.ka.ru.models.UserFlatBuffers;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 
@@ -25,19 +24,19 @@ public class FlatBuffersSerializer {
         for (int i = 0; i < user.getRoles().size(); i++) {
             rolesOffsets[i] = builder.createString(user.getRoles().get(i));
         }
-        int rolesVector = UserFlatBuffers.User.createRolesVector(builder, rolesOffsets);
-        
+        int rolesVector = ram.ka.ru.models.flatbuffers.User.createRolesVector(builder, rolesOffsets);
+
         // Создаем объект User
-        UserFlatBuffers.User.startUser(builder);
-        UserFlatBuffers.User.addId(builder, idOffset);
-        UserFlatBuffers.User.addName(builder, nameOffset);
-        UserFlatBuffers.User.addEmail(builder, emailOffset);
-        UserFlatBuffers.User.addAge(builder, user.getAge());
-        UserFlatBuffers.User.addActive(builder, user.isActive());
-        UserFlatBuffers.User.addRoles(builder, rolesVector);
-        UserFlatBuffers.User.addBalance(builder, user.getBalance());
+        ram.ka.ru.models.flatbuffers.User.startUser(builder);
+        ram.ka.ru.models.flatbuffers.User.addId(builder, idOffset);
+        ram.ka.ru.models.flatbuffers.User.addName(builder, nameOffset);
+        ram.ka.ru.models.flatbuffers.User.addEmail(builder, emailOffset);
+        ram.ka.ru.models.flatbuffers.User.addAge(builder, user.getAge());
+        ram.ka.ru.models.flatbuffers.User.addActive(builder, user.isActive());
+        ram.ka.ru.models.flatbuffers.User.addRoles(builder, rolesVector);
+        ram.ka.ru.models.flatbuffers.User.addBalance(builder, user.getBalance());
         
-        int userOffset = UserFlatBuffers.User.endUser(builder);
+        int userOffset = ram.ka.ru.models.flatbuffers.User.endUser(builder);
         builder.finish(userOffset);
         
         return builder.sizedByteArray();
@@ -45,7 +44,7 @@ public class FlatBuffersSerializer {
     
     public User deserialize(byte[] data) throws IOException {
         ByteBuffer buffer = ByteBuffer.wrap(data);
-        UserFlatBuffers.User userFlat = UserFlatBuffers.User.getRootAsUser(buffer);
+        ram.ka.ru.models.flatbuffers.User userFlat = ram.ka.ru.models.flatbuffers.User.getRootAsUser(buffer);
         
         User user = new User();
         user.setId(userFlat.id());
