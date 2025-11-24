@@ -5,7 +5,7 @@ import ram.ka.ru.models.User;
 
 import java.io.IOException;
 
-public class JsonSerializer {
+public class JsonSerializer implements UserSerializer {
     private static final ObjectMapper mapper = new ObjectMapper();
     
     public byte[] serialize(User user) throws IOException {

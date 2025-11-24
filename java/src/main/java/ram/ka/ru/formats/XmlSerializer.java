@@ -11,7 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class XmlSerializer {
+public class XmlSerializer implements UserSerializer {
     private final JAXBContext jaxbContext;
     
     public XmlSerializer() {

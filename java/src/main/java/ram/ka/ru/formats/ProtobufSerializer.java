@@ -6,7 +6,7 @@ import ram.ka.ru.models.UserProtos;
 
 import java.io.IOException;
 
-public class ProtobufSerializer {
+public class ProtobufSerializer implements UserSerializer {
     
     public byte[] serialize(User user) throws IOException {
         UserProtos.UserProto.Builder builder = UserProtos.UserProto.newBuilder()

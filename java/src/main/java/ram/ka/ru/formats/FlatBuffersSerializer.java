@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 
-public class FlatBuffersSerializer {
+public class FlatBuffersSerializer implements UserSerializer {
     
     public byte[] serialize(User user) throws IOException {
         FlatBufferBuilder builder = new FlatBufferBuilder(1024);
