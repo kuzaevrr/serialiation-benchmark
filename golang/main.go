@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	warmupIterations      = 1000
-	measurementIterations = 10000
-	dataSize              = 1000
+	warmupIterations      = 10000
+	measurementIterations = 1000000
+	dataSize              = 100 * 1024
 )
 
 type BenchmarkResult struct {
@@ -45,7 +45,7 @@ func generateTestData(size int) []*models.User {
 			ID:      fmt.Sprintf("user_%d", i),
 			Name:    fmt.Sprintf("User Name %d", i),
 			Email:   fmt.Sprintf("user%d@example.com", i),
-			Age:     20 + r.Intn(50),
+			Age:     int32(20 + r.Intn(50)),
 			Active:  r.Float32() < 0.5,
 			Roles:   roles,
 			Balance: 1000.0 + r.Float64()*9000.0,
