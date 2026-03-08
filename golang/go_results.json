@@ -81,6 +81,3 @@
     }
   ]
 }
---- PASS: TestSerializationBenchmark (0.00s)
-PASS
-ok  	golang	0.260s
