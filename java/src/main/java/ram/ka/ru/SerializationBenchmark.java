@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.flatbuffers.FlatBufferBuilder;
-import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -44,7 +43,7 @@ class BenchmarkMeta {
     String language = "java";
     String version = "21";
     String timestamp = Instant.now().toString();
-    int threads = 4;
+    int threads = 1;
     int total_iterations = 10000;
 }
 
