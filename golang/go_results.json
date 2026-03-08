@@ -2,7 +2,7 @@
   "benchmark_meta": {
     "language": "go",
     "version": "1.23",
-    "timestamp": "2026-03-09T00:11:49+05:00",
+    "timestamp": "2026-03-09T00:39:36+05:00",
     "threads": 4,
     "total_iterations": 10000
   },
@@ -11,16 +11,16 @@
       "format": "json",
       "operation": "roundtrip",
       "performance": {
-        "rps": 12069394.188828085,
+        "rps": 18269011.189769354,
         "latency_ns": {
-          "mean": 82,
-          "p50": 82,
-          "p99": 123
+          "mean": 54,
+          "p50": 54,
+          "p99": 81
         }
       },
       "resources": {
-        "memory_allocated_bytes": 19600,
-        "memory_allocations_count": 246,
+        "memory_allocated_bytes": 14496,
+        "memory_allocations_count": 245,
         "cpu_user_time_ms": 0,
         "cpu_system_time_ms": 0
       }
@@ -29,16 +29,16 @@
       "format": "xml",
       "operation": "roundtrip",
       "performance": {
-        "rps": 33632324.69991558,
+        "rps": 36101083.032490976,
         "latency_ns": {
-          "mean": 29,
-          "p50": 29,
-          "p99": 43
+          "mean": 27,
+          "p50": 27,
+          "p99": 40
         }
       },
       "resources": {
-        "memory_allocated_bytes": 49720,
-        "memory_allocations_count": 676,
+        "memory_allocated_bytes": 49688,
+        "memory_allocations_count": 675,
         "cpu_user_time_ms": 0,
         "cpu_system_time_ms": 0
       }
@@ -47,16 +47,16 @@
       "format": "protobuf",
       "operation": "roundtrip",
       "performance": {
-        "rps": 16036357.630018778,
+        "rps": 14732053.412532853,
         "latency_ns": {
-          "mean": 62,
-          "p50": 62,
-          "p99": 93
+          "mean": 67,
+          "p50": 67,
+          "p99": 100
         }
       },
       "resources": {
-        "memory_allocated_bytes": 17648,
-        "memory_allocations_count": 200,
+        "memory_allocated_bytes": 17104,
+        "memory_allocations_count": 198,
         "cpu_user_time_ms": 0,
         "cpu_system_time_ms": 0
       }
@@ -65,16 +65,16 @@
       "format": "flatbuffers",
       "operation": "roundtrip",
       "performance": {
-        "rps": 415230660.6319811,
+        "rps": 182925713.86759838,
         "latency_ns": {
-          "mean": 2,
-          "p50": 2,
-          "p99": 3
+          "mean": 5,
+          "p50": 5,
+          "p99": 7
         }
       },
       "resources": {
-        "memory_allocated_bytes": 4448,
-        "memory_allocations_count": 68,
+        "memory_allocated_bytes": 4912,
+        "memory_allocations_count": 69,
         "cpu_user_time_ms": 0,
         "cpu_system_time_ms": 0
       }

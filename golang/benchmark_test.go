@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"log"
 	"runtime"
 	"sync"
 	"testing"
@@ -279,6 +280,9 @@ func TestSerializationBenchmark(t *testing.T) {
 		Results: results,
 	}
 
-	output, _ := json.MarshalIndent(report, "", "  ")
+	output, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(string(output))
 }

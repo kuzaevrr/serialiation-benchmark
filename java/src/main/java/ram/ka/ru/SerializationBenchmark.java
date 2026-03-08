@@ -1,8 +1,11 @@
 package ram.ka.ru;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.flatbuffers.FlatBufferBuilder;
+import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -15,7 +18,9 @@ import java.lang.management.MemoryUsage;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.stream.IntStream;
 
 // === Модели данных ===
 
@@ -52,6 +57,8 @@ class LatencyStats {
 @Setter
 @Getter
 class PerformanceStats {
+    @JsonProperty
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     double rps;
     LatencyStats latency_ns = new LatencyStats();
 }
@@ -158,6 +165,7 @@ public class SerializationBenchmark {
 
         // Вывод JSON
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
+        executor.shutdown();
     }
 
     static BenchmarkResult measure(String format, Runnable task) throws Exception {
@@ -168,35 +176,47 @@ public class SerializationBenchmark {
         long start = System.nanoTime();
 
         CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            executor.submit(() -> {
-                try {
-                    for (int k = 0; k < TOTAL_ITERATIONS / THREAD_COUNT; k++) {
-                        task.run();
-                    }
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
+        IntStream.range(0, THREAD_COUNT)
+                .parallel()
+                .forEach(i -> {
+                    executor.submit(
+                            () -> {
+                                try {
+                                    for (int k = 0; k < TOTAL_ITERATIONS / THREAD_COUNT; k++) {
+                                        task.run();
+                                    }
+                                } finally {
+                                    latch.countDown();
+                                }
+                            }
+                    );
+                });
+
         latch.await();
 
-        long elapsed = System.nanoTime() - start;
+        long elapsedNs = System.nanoTime() - start; // Время в наносекундах
         MemoryUsage endMem = memBean.getHeapMemoryUsage();
 
-        double rps = (double) TOTAL_ITERATIONS / (elapsed / 1_000_000_000.0);
-        long latency = elapsed / TOTAL_ITERATIONS;
+        double rps = (double) TOTAL_ITERATIONS / toSeconds(elapsedNs);
+        long latencyNs = elapsedNs / TOTAL_ITERATIONS;
+
         long memUsed = Math.max(0, endMem.getUsed() - startMem.getUsed());
 
         BenchmarkResult r = new BenchmarkResult();
         r.format = format;
         r.performance.rps = rps;
-        r.performance.latency_ns.mean = latency;
-        r.performance.latency_ns.p50 = latency;
-        r.performance.latency_ns.p99 = (long) (latency * 1.5);
+        r.performance.latency_ns.mean = latencyNs;
+        r.performance.latency_ns.p50 = latencyNs;
+        r.performance.latency_ns.p99 = (long) (latencyNs * 1.5);
         r.resources.memory_allocated_bytes = memUsed;
         r.resources.memory_allocations_count = 0;
 
         return r;
+    }
+
+    static double toSeconds(long elapsedNanos) {
+        long sec = elapsedNanos / 1_000_000_000L;
+        long nsec = elapsedNanos % 1_000_000_000L;
+        return (double) sec + (double) nsec / 1e9;
     }
 }
