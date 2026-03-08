@@ -1,0 +1,86 @@
+{
+  "benchmark_meta": {
+    "language": "go",
+    "version": "1.23",
+    "timestamp": "2026-03-09T00:11:49+05:00",
+    "threads": 4,
+    "total_iterations": 10000
+  },
+  "results": [
+    {
+      "format": "json",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 12069394.188828085,
+        "latency_ns": {
+          "mean": 82,
+          "p50": 82,
+          "p99": 123
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 19600,
+        "memory_allocations_count": 246,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    },
+    {
+      "format": "xml",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 33632324.69991558,
+        "latency_ns": {
+          "mean": 29,
+          "p50": 29,
+          "p99": 43
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 49720,
+        "memory_allocations_count": 676,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    },
+    {
+      "format": "protobuf",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 16036357.630018778,
+        "latency_ns": {
+          "mean": 62,
+          "p50": 62,
+          "p99": 93
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 17648,
+        "memory_allocations_count": 200,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    },
+    {
+      "format": "flatbuffers",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 415230660.6319811,
+        "latency_ns": {
+          "mean": 2,
+          "p50": 2,
+          "p99": 3
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 4448,
+        "memory_allocations_count": 68,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    }
+  ]
+}
+--- PASS: TestSerializationBenchmark (0.00s)
+PASS
+ok  	golang	0.260s

@@ -2,7 +2,7 @@
 package models
 
 type User struct {
-	ID      string   `json:"id" xml:"id"`
+	Id      string   `json:"id" xml:"id"`
 	Name    string   `json:"name" xml:"name"`
 	Email   string   `json:"email" xml:"email"`
 	Age     int32    `json:"age" xml:"age"`

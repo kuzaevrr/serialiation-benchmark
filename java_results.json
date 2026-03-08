@@ -1,0 +1,83 @@
+{
+  "benchmark_meta": {
+    "language": "java",
+    "version": "21",
+    "timestamp": "2026-03-08T19:08:23.904041Z",
+    "threads": 4,
+    "total_iterations": 10000
+  },
+  "results": [
+    {
+      "format": "json",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 11784.743981663532,
+        "latency_ns": {
+          "mean": 84855,
+          "p50": 84855,
+          "p99": 127282
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 48872840,
+        "memory_allocations_count": 0,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    },
+    {
+      "format": "xml",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 61989.71500123146,
+        "latency_ns": {
+          "mean": 16131,
+          "p50": 16131,
+          "p99": 24196
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 67108864,
+        "memory_allocations_count": 0,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    },
+    {
+      "format": "protobuf",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 211089.96153877574,
+        "latency_ns": {
+          "mean": 4737,
+          "p50": 4737,
+          "p99": 7105
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 8388608,
+        "memory_allocations_count": 0,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    },
+    {
+      "format": "flatbuffers",
+      "operation": "roundtrip",
+      "performance": {
+        "rps": 339143.5289668084,
+        "latency_ns": {
+          "mean": 2948,
+          "p50": 2948,
+          "p99": 4422
+        }
+      },
+      "resources": {
+        "memory_allocated_bytes": 16777216,
+        "memory_allocations_count": 0,
+        "cpu_user_time_ms": 0,
+        "cpu_system_time_ms": 0
+      }
+    }
+  ]
+}
